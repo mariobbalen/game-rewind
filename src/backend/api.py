@@ -22,6 +22,7 @@ reviews_collection = mongo_client["game_rewind"]["reviews"]
 # ajusta problema de CORS que acontecia ao se comunicar com o front
 @app.after_request
 def add_cors_headers(response):
+    # permite que a origem venha de qualquer lugar, para os métodos especificados
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, DELETE, OPTIONS"
@@ -67,7 +68,7 @@ def save_review():
     rating = max(0.0, min(5.0, float(data.get("rating", 0))))
     rating = round(rating * 2) / 2 
 
-    # cria o json que vai ser enviado
+    # cria o json que vai ser enviado como review
     review = {
         "game_id": data["game_id"],
         "name": data["name"],
@@ -77,6 +78,7 @@ def save_review():
         "review": data.get("review", ""),
     }
 
+    # cria ou atualiza
     reviews_collection.update_one(
         {"game_id": review["game_id"]}, {"$set": review}, upsert=True
     )

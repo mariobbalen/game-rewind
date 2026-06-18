@@ -37,11 +37,13 @@ def search_games(query: str, access_token: str) -> list[dict]:
             "Client-ID": CLIENT_ID,
             "Authorization": f"Bearer {access_token}",
         },
+        # aquilo que vai ser buscado na api
         data=f'search "{query}"; fields name,rating,first_release_date,cover.image_id; limit 100;',
     )
     response.raise_for_status()
     games = response.json()
 
+    # pega a capa para mostrar ao buscar os jogos
     for game in games:
         cover = game.pop("cover", None)
         if cover:
