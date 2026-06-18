@@ -39,7 +39,7 @@ O backend precisa de algumas variáveis de ambiente, definidas em `src/backend/.
 1. Suba um MongoDB (local ou via container).
 2. Configure o arquivo `.env` do backend conforme descrito acima.
 3. Construa e execute os containers
-4. Acesse a interface em `http://127.0.0.1:8080`. A API ficará disponível em `http://127.0.0.1:5000`.
+4. Acesse a interface em `http://localhost:8080`. A API ficará disponível em `http://localhost:5000`.
 
 ## Endpoints da API
 
