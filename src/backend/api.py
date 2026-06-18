@@ -14,6 +14,7 @@ from util import get_access_token, search_games
 
 app = Flask(__name__)
 
+# busca a uri do mongo do env, mas se não exisitr, busca pela default
 MONGO_URI = os.environ.get("MONGO_URI", "mongodb://localhost:27017")
 mongo_client = MongoClient(MONGO_URI)
 reviews_collection = mongo_client["game_rewind"]["reviews"]
@@ -42,7 +43,7 @@ def get_cached_token() -> str:
         _access_token = get_access_token()
     return _access_token
 
-
+# pega os jogos
 @app.get("/games")
 def games():
     query = request.args.get("q", "")
