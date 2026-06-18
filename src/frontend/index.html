@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game Rewind</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Game Rewind</h1>
+  <nav><a href="reviews.html">Ver minhas avaliações →</a></nav>
+
+  <div class="search-bar">
+    <input type="text" id="query" placeholder="Busque por um jogo..." />
+    <button id="search-btn">Buscar</button>
+  </div>
+
+  <p class="status" id="status"></p>
+  <div class="grid" id="results"></div>
+
+  <script src="star-rating.js"></script>
+  <script>
+    const API_BASE = "http://127.0.0.1:5000";
+
+    const queryInput = document.getElementById("query");
+    const searchBtn = document.getElementById("search-btn");
+    const resultsEl = document.getElementById("results");
+    const statusEl = document.getElementById("status");
+
+    let reviewsByGameId = {};
+
+    async function loadReviews() {
+      const response = await fetch(`${API_BASE}/reviews`);
+      const reviews = await response.json();
+      reviewsByGameId = Object.fromEntries(reviews.map((r) => [r.game_id, r]));
+    }
+
+    function buildCard(game) {
+      const existing = reviewsByGameId[game.id] || {};
+
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const img = document.createElement("img");
+      img.src = game.cover_url || "https://placehold.co/264x352?text=No+Cover";
+      img.alt = game.name;
+
+      const info = document.createElement("div");
+      info.className = "info";
+
+      const title = document.createElement("p");
+      title.className = "title";
+      title.textContent = game.name;
+
+      const rating = document.createElement("p");
+      rating.className = "rating";
+      rating.textContent = game.rating ? `Nota no IGDB: ${game.rating.toFixed(1)}` : "Sem nota no IGDB";
+
+      const playedLabel = document.createElement("label");
+      playedLabel.className = "played-toggle";
+      const playedCheckbox = document.createElement("input");
+      playedCheckbox.type = "checkbox";
+      playedCheckbox.checked = Boolean(existing.played);
+      playedLabel.append(playedCheckbox, "Jogado");
+
+      const starsContainer = document.createElement("div");
+      starsContainer.className = "stars";
+      const starRating = createStarRating(starsContainer, {
+        initialRating: existing.rating || 0,
+        interactive: true,
+      });
+
+      const reviewBox = document.createElement("div");
+      reviewBox.className = "review-box";
+      const textarea = document.createElement("textarea");
+      textarea.placeholder = "Escreva sua avaliação...";
+      textarea.value = existing.review || "";
+      reviewBox.append(textarea);
+
+      const saveBtn = document.createElement("button");
+      saveBtn.className = "save-btn";
+      saveBtn.textContent = "Salvar avaliação";
+
+      const saveStatus = document.createElement("p");
+      saveStatus.className = "save-status";
+
+      saveBtn.addEventListener("click", async () => {
+        saveStatus.textContent = "Salvando...";
+        try {
+          const response = await fetch(`${API_BASE}/reviews`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              game_id: game.id,
+              name: game.name,
+              cover_url: game.cover_url,
+              played: playedCheckbox.checked,
+              rating: starRating.get(),
+              review: textarea.value,
+            }),
+          });
+          if (!response.ok) throw new Error(`Request failed: ${response.status}`);
+          const saved = await response.json();
+          reviewsByGameId[game.id] = saved;
+          saveStatus.textContent = "Salvo!";
+        } catch (err) {
+          saveStatus.textContent = `Erro: ${err.message}`;
+        }
+      });
+
+      info.append(title, rating, playedLabel, starsContainer, reviewBox, saveBtn, saveStatus);
+      card.append(img, info);
+      return card;
+    }
+
+    async function search() {
+      const query = queryInput.value.trim();
+      if (!query) {
+        statusEl.textContent = "Busque por um jogo para começar.";
+        resultsEl.innerHTML = "";
+        return;
+      }
+
+      statusEl.textContent = "Carregando...";
+      resultsEl.innerHTML = "";
+
+      try {
+        await loadReviews();
+
+        const response = await fetch(`${API_BASE}/games?q=${encodeURIComponent(query)}`);
+        if (!response.ok) throw new Error(`Request failed: ${response.status}`);
+
+        const games = await response.json();
+        statusEl.textContent = games.length ? "" : "Nenhum jogo encontrado.";
+
+        for (const game of games) {
+          resultsEl.append(buildCard(game));
+        }
+      } catch (err) {
+        statusEl.textContent = `Erro: ${err.message}`;
+      }
+    }
+
+    searchBtn.addEventListener("click", search);
+    queryInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") search();
+    });
+
+    statusEl.textContent = "Busque por um jogo para começar.";
+  </script>
+</body>
+</html>

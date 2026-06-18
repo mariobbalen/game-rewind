@@ -1,0 +1,231 @@
+:root {
+  color-scheme: dark;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 2rem;
+  background: #14141c;
+  color: #f0f0f5;
+}
+
+h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.6rem;
+}
+
+nav {
+  margin-bottom: 1.5rem;
+}
+
+nav a {
+  color: #a78bfa;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+.search-bar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  max-width: 480px;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid #3a3a4a;
+  background: #1f1f2b;
+  color: inherit;
+  font-size: 1rem;
+}
+
+.search-bar input:focus {
+  outline: 2px solid #7c5cff;
+}
+
+.search-bar button {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  border: none;
+  background: #7c5cff;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.search-bar button:hover {
+  background: #6a48ff;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+
+.card {
+  background: #1f1f2b;
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.card img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  background: #2a2a38;
+}
+
+.card .info {
+  padding: 0.6rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.card .title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.card .rating {
+  font-size: 0.8rem;
+  color: #b0b0c0;
+  margin: 0;
+}
+
+.card .review-text {
+  font-size: 0.85rem;
+  color: #d8d8e2;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.played-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+}
+
+.played-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: #2f9e60;
+  color: white;
+  width: fit-content;
+}
+
+.stars {
+  display: flex;
+  gap: 0.1rem;
+  font-size: 1.2rem;
+}
+
+.star-wrap {
+  position: relative;
+  display: inline-block;
+  width: 1.2rem;
+  height: 1.2rem;
+  line-height: 1;
+}
+
+.star-bg,
+.star-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.star-bg {
+  color: #3a3a4a;
+}
+
+.star-fill {
+  color: #ffc94d;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.star-click-zone {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  cursor: pointer;
+}
+
+.star-click-zone.left {
+  left: 0;
+}
+
+.star-click-zone.right {
+  left: 50%;
+}
+
+.review-box textarea {
+  width: 100%;
+  min-height: 60px;
+  resize: vertical;
+  padding: 0.4rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #3a3a4a;
+  background: #14141c;
+  color: inherit;
+  font-family: inherit;
+  font-size: 0.85rem;
+  box-sizing: border-box;
+}
+
+.save-btn {
+  padding: 0.45rem;
+  border-radius: 6px;
+  border: none;
+  background: #2f9e60;
+  color: white;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.save-btn:hover {
+  background: #28854f;
+}
+
+.delete-btn {
+  padding: 0.45rem;
+  border-radius: 6px;
+  border: 1px solid #3a3a4a;
+  background: transparent;
+  color: #f0f0f5;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background: #2a1f24;
+  border-color: #b04a4a;
+}
+
+.save-status {
+  font-size: 0.75rem;
+  color: #8ed1aa;
+  min-height: 1em;
+}
+
+.status {
+  color: #b0b0c0;
+}

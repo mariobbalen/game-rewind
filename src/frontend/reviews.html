@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game Rewind - Minhas Avaliações</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Minhas Avaliações</h1>
+  <nav><a href="index.html">← Voltar para a busca</a></nav>
+
+  <p class="status" id="status"></p>
+  <div class="grid" id="results"></div>
+
+  <script src="star-rating.js"></script>
+  <script>
+    const API_BASE = "http://127.0.0.1:5000";
+    const resultsEl = document.getElementById("results");
+    const statusEl = document.getElementById("status");
+
+    async function deleteReview(gameId) {
+      const response = await fetch(`${API_BASE}/reviews/${gameId}`, { method: "DELETE" });
+      if (!response.ok) throw new Error(`Request failed: ${response.status}`);
+    }
+
+    async function saveReview(review) {
+      const response = await fetch(`${API_BASE}/reviews`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(review),
+      });
+      if (!response.ok) throw new Error(`Request failed: ${response.status}`);
+      return response.json();
+    }
+
+    function buildViewCard(review, onEdit, onDelete) {
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const img = document.createElement("img");
+      img.src = review.cover_url || "https://placehold.co/264x352?text=No+Cover";
+      img.alt = review.name;
+
+      const info = document.createElement("div");
+      info.className = "info";
+
+      const title = document.createElement("p");
+      title.className = "title";
+      title.textContent = review.name;
+      info.append(title);
+
+      if (review.played) {
+        const badge = document.createElement("span");
+        badge.className = "played-badge";
+        badge.textContent = "Jogado";
+        info.append(badge);
+      }
+
+      const starsContainer = document.createElement("div");
+      starsContainer.className = "stars";
+      createStarRating(starsContainer, { initialRating: review.rating || 0, interactive: false });
+      info.append(starsContainer);
+
+      if (review.review) {
+        const text = document.createElement("p");
+        text.className = "review-text";
+        text.textContent = review.review;
+        info.append(text);
+      }
+
+      const editBtn = document.createElement("button");
+      editBtn.className = "save-btn";
+      editBtn.textContent = "Editar";
+      editBtn.addEventListener("click", onEdit);
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "delete-btn";
+      deleteBtn.textContent = "Excluir";
+      deleteBtn.addEventListener("click", onDelete);
+
+      info.append(editBtn, deleteBtn);
+      card.append(img, info);
+      return card;
+    }
+
+    function buildEditCard(review, onSave, onCancel) {
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const img = document.createElement("img");
+      img.src = review.cover_url || "https://placehold.co/264x352?text=No+Cover";
+      img.alt = review.name;
+
+      const info = document.createElement("div");
+      info.className = "info";
+
+      const title = document.createElement("p");
+      title.className = "title";
+      title.textContent = review.name;
+
+      const playedLabel = document.createElement("label");
+      playedLabel.className = "played-toggle";
+      const playedCheckbox = document.createElement("input");
+      playedCheckbox.type = "checkbox";
+      playedCheckbox.checked = Boolean(review.played);
+      playedLabel.append(playedCheckbox, "Jogado");
+
+      const starsContainer = document.createElement("div");
+      starsContainer.className = "stars";
+      const starRating = createStarRating(starsContainer, {
+        initialRating: review.rating || 0,
+        interactive: true,
+      });
+
+      const reviewBox = document.createElement("div");
+      reviewBox.className = "review-box";
+      const textarea = document.createElement("textarea");
+      textarea.placeholder = "Escreva sua avaliação...";
+      textarea.value = review.review || "";
+      reviewBox.append(textarea);
+
+      const saveBtn = document.createElement("button");
+      saveBtn.className = "save-btn";
+      saveBtn.textContent = "Salvar";
+
+      const cancelBtn = document.createElement("button");
+      cancelBtn.className = "delete-btn";
+      cancelBtn.textContent = "Cancelar";
+      cancelBtn.addEventListener("click", onCancel);
+
+      const saveStatus = document.createElement("p");
+      saveStatus.className = "save-status";
+
+      saveBtn.addEventListener("click", async () => {
+        saveStatus.textContent = "Salvando...";
+        try {
+          const saved = await saveReview({
+            game_id: review.game_id,
+            name: review.name,
+            cover_url: review.cover_url,
+            played: playedCheckbox.checked,
+            rating: starRating.get(),
+            review: textarea.value,
+          });
+          onSave(saved);
+        } catch (err) {
+          saveStatus.textContent = `Erro: ${err.message}`;
+        }
+      });
+
+      info.append(title, playedLabel, starsContainer, reviewBox, saveBtn, cancelBtn, saveStatus);
+      card.append(img, info);
+      return card;
+    }
+
+    function renderCard(review) {
+      let card = buildViewCard(
+        review,
+        () => {
+          const editCard = buildEditCard(
+            review,
+            (saved) => card.replaceWith(renderCard(saved)),
+            () => editCard.replaceWith(renderCard(review))
+          );
+          card.replaceWith(editCard);
+          card = editCard;
+        },
+        async () => {
+          if (!confirm(`Remover sua avaliação de "${review.name}"?`)) return;
+          await deleteReview(review.game_id);
+          card.remove();
+        }
+      );
+      return card;
+    }
+
+    async function loadReviews() {
+      statusEl.textContent = "Carregando...";
+      resultsEl.innerHTML = "";
+
+      try {
+        const response = await fetch(`${API_BASE}/reviews`);
+        if (!response.ok) throw new Error(`Request failed: ${response.status}`);
+
+        const reviews = await response.json();
+        const reviewed = reviews.filter((r) => r.played || r.rating > 0 || r.review);
+
+        statusEl.textContent = reviewed.length ? "" : "Nenhuma avaliação ainda — busque por um jogo!";
+
+        for (const review of reviewed) {
+          resultsEl.append(renderCard(review));
+        }
+      } catch (err) {
+        statusEl.textContent = `Erro: ${err.message}`;
+      }
+    }
+
+    loadReviews();
+  </script>
+</body>
+</html>
