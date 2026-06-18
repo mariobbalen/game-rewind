@@ -1,6 +1,6 @@
 # Diário de Desenvolvimento
 
-## Erros de aplicação.
+## Erros de Aplicação
 
 ### Erro de Firewall
 Devido ao firewall da faculdade, a API da twitch que utilizamos para buscar os jogos acabava sendo bloqueada. A solução rápida e prática foi de alterar a rede.
@@ -26,3 +26,11 @@ def reviews_preflight(game_id=None):
 ![Erro Cors](erro_cors.png)
 
 ## Erros de Infra
+Ao rodar o docker compose up, ocorreu um erro de decodificação, devido a um espaço desnecessário
+![Erro Compose](erro_teste_dockerc.png)
+
+Ao tentar rodar novamente, o usuário e senha do banco de dados não foi identificado, devido ao docker-compose estar na pasta raiz, e o arquivo env estar na pasta de backend
+![Erro Usuario e Senha](erro_user_e_pass.png)
+
+Este erro ocorreu devido a faltar seção de volumes 
+![Erro volumes](falta_volume.png)

@@ -8,9 +8,12 @@
 import os
 
 from flask import Flask, jsonify, request
+from dotenv import load_dotenv
 from pymongo import MongoClient
 
 from util import get_access_token, search_games
+
+load_dotenv(dotenv_path="../.env")
 
 app = Flask(__name__)
 
