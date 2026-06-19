@@ -6,7 +6,7 @@ import os
 import requests
 from dotenv import load_dotenv
 
-load_dotenv(dotenv_path="../.env")
+load_dotenv("./.env")
 
 # busca do env
 CLIENT_ID = os.environ["TWITCH_CLIENT_ID"]

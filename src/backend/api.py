@@ -13,7 +13,7 @@ from pymongo import MongoClient
 
 from util import get_access_token, search_games
 
-load_dotenv(dotenv_path="../.env")
+load_dotenv("./.env")
 
 app = Flask(__name__)
 
