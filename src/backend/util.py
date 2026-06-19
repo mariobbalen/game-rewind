@@ -9,8 +9,8 @@ from dotenv import load_dotenv
 load_dotenv("./.env")
 
 # busca do env
-CLIENT_ID = os.environ["TWITCH_CLIENT_ID"]
-CLIENT_SECRET = os.environ["TWITCH_CLIENT_SECRET"]
+CLIENT_ID = os.getenv("TWITCH_CLIENT_ID")
+CLIENT_SECRET = os.getenv("TWITCH_CLIENT_SECRET")
 
 # verifica se tem acesso a api (se as credencias estão ok)
 def get_access_token() -> str:

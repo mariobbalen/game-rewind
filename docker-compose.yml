@@ -17,6 +17,10 @@ services:
       context: ./src/backend
       dockerfile: Dockerfile
     container_name: backend
+    environment: # necessário enviar para serem usadas pela api
+      TWITCH_CLIENT_ID: ${TWITCH_CLIENT_ID}
+      TWITCH_CLIENT_SECRET: ${TWITCH_CLIENT_SECRET}
+      MONGO_URI: ${MONGO_URI}
     ports: 
       - "5000:5000"
     volumes:
